@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Original Tulsimala</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <style media="screen"></style>
+    <style>
+        .logo img {
+            height: 80px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .modal-header-info {
+            color: #fff;
+            padding: 9px 15px;
+            border-bottom: 1px solid #eee;
+            background-color: #FC4E03;
+            -moz-border-radius-topleft: 5px;
+            -moz-border-radius-topright: 5px;
+            text-align: center;
+        }
+
+        .success-inner h2 li {
+            color: #FC4E03;
+            list-style: none;
+            text-decoration: none;
+        }
+
+        .success-inner h2 li a {
+            color: #FC4E03;
+        }
+
+        table,
+        td,
+        th {
+            border: 1px solid;
+            width: 100px;
+            height: 30px;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        .table-heading {
+            color: #FC4E03;
+        }
+
+        .WorldwideCon .single-service.homeAboutWrapper {
+            display: flex;
+            flex-wrap: wrap;
+            padding-bottom: 0px;
+        }
+
+        .WorldwideCon {
+            display: inline-block;
+            width: 100%;
+            vertical-align: top;
+        }
+
+        tr.info-container {
+            font-size: 16px;
+            color: rgb(68, 48, 40) !important;
+            background: #F8FFEE !important;
+            padding: 20px 39px;
+            word-break: break-word;
+            border: 1px solid #256125;
+            text-align: justify;
+        }
+
+        .WorldwideCon .single-service ul {
+            list-style: none;
+        }
+
+        .WorldwideCon .single-service .email-head-num li {
+            color: #fc4e03;
+            text-decoration: underline;
+        }
+
+        .WorldwideCon .single-service .email-heading li {
+            color: #3d34eb;
+        }
+
+        .billing-add {
+            float: left;
+            width: 50%;
+        }
+
+        .bottom-container {
+            margin: 58px 1px 1px 1px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="logo">
+            <img src="http://localhost/originaltulsi_laravel/assets/images/1643978956otmslogo.png" alt="img logo"></a>
+        </div>
+        <div class="modal show" id="modalCompose">
+            <div class="modal-dialog">
+                <div class="modal-header modal-header-info">
+                    <h4 class="modal-title">Your Order:# {{$emailData['Order_id']}}</h4>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="success-inner">
+            <h3><span>Thank you for shopping with OriginalTulsiMala!</span></h3>
+            <h2>
+                <li><a href="{{url('user/order/invoice/'.$emailData['Order_id'])}}">[Order
+                        #{{$emailData['Order_id']}}]</a><span>({{date('F d,
+                        Y',strtotime($order_details['created_at']))}})</li></span>
+            </h2>
+        </div>
+        <table>
+            <tr style=" border-bottom: 1pt solid black;">
+
+                <th>Product</th>
+                <th>Quantity</th>
+                <th>Price</th>
+            </tr>
+            @php
+            $option_price = 0;
+            $total = 0;
+            @endphp
+            @foreach($cart_item as $item)
+            @php
+            $total += $item['main_price'] * $item['qty'];
+            $option_price += $item['attribute_price'];
+            $grandSubtotal = $total + $option_price;
+            @endphp
+            <tr>
+                <td>{{$item['name']}}</td>
+                <td style="text-align: center">{{$item['qty']}}</td>
+                <td style="text-align: center">
+                    @if ($setting->currency_direction == 1)
+                    &#8377; {{round($item['main_price']*$order_details['currency_value'],2)}}
+                    @else
+                    &#8377; {{round($item['main_price']*$order_details['currency_value'],2)}}
+                    @endif
+                </td>
+             </tr>
+             @endforeach
+
+            <tr>
+                <td colspan="2">Shipping Charge</td>
+                @php
+                $shipping = json_decode($order_details['shipping'],true);
+                @endphp
+                @if($shipping != null && is_array($shipping) && isset($shipping['price']))
+                <td style="text-align: center"> &#8377; {{round($shipping['price']*$order_details['currency_value'],2)}}
+                </td>
+                @else
+                <td style="text-align: center"> &#8377; 0</td>
+                @endif
+            </tr>
+            <tr>
+                <td colspan="2">Payment Method</td>
+                <td style="text-align: center">{{$order_details['payment_method']}}</td>
+            </tr>
+            <tr>
+                <td colspan="2">Total</td>
+                <td style="text-align: center">&#8377; {{PriceHelper::OrderTotal((object)$order_details)}}</td>
+            </tr>
+        </table>
+        <div class="bottom-container">
+            <table>
+                <tr style=" border-bottom: 1pt solid black;" class="table-heading">
+                    <th>
+                        <h2><span>Billing address</span></h2>
+                    </th>
+                    <th>
+                        <h2><span>For More Inquiry!!</span></h2>
+                    </th>
+
+                </tr>
+                <tr class="info-container">
+                    <td>
+                        <section class="selected-product-section theme2" style="margin-bottom:30px;">
+
+                            <div class="container">
+                                <div class="WorldwideCon">
+                                    <div class="single-service single-service2 homeAboutWrapper">
+                                        <ul>
+                                            <li class="homeAboutWrapper">{{$billing_info['bill_first_name']}}
+                                                {{$billing_info['bill_last_name']}}</li>
+                                            <li class="homeAboutWrapper">{{$billing_info['bill_address1']}}</li>
+                                            @if(isset($billing_info['bill_address2']))
+                                            <li class="homeAboutWrapper">{{$billing_info['bill_address2']}}</li>
+                                            @endif
+                                            <li class="homeAboutWrapper">
+                                                {{$billing_info['bill_city']}},{{$billing_info['bill_country']}}</li>
+                                            @if(isset($billing_info['state']))
+                                            <li class="homeAboutWrapper">{{$billing_info['state']}}</li>
+                                            @endif
+
+                                            <li class="homeAboutWrapper">{{$billing_info['bill_zip']}}</li>
+                                            <div class="email-head-num">
+                                                <li>{{$billing_info['bill_phone']}}</li>
+                                            </div>
+                                            <div class="email-heading">
+                                                <li>{{$billing_info['bill_email']}}</li>
+                                            </div>
+
+                                            @if($billing_info['description']!=null)
+                                            <p>
+                                                {{$billing_info['description']}}
+                                            </p>
+                                            @endif
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                    </td>
+                    <td>
+                        <section class="selected-product-section theme2" style="margin-bottom:30px;">
+
+                            <div class="container">
+                                <div class="WorldwideCon">
+                                    <div class="single-service single-service2 homeAboutWrapper">
+                                        <section class="widget">
+
+                                            <ul class="list-icon margin-bottom-1x" style="list-style-type:none;">
+                                                <li> <i class="icon-phone text-muted"></i>+918898230622</li>
+                                                <li> <i class="fa fa-whatsapp text-muted"></i>+919205700981</li>
+                                                <li> <i class="fa fa-envelope text-muted"></i>info@originaltulsimala.com
+                                                </li>
+                                                <li> <i
+                                                        class="fa fa-envelope text-muted"></i>originaltulsimalastore@gmail.com
+                                                </li>
+                                                <li> <a
+                                                        href="https://www.originaltulsimala.com/">https://www.originaltulsimala.com/</a>
+                                                </li>
+                                            </ul>
+                                        </section>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                    </td>
+
+                </tr>
+
+
+            </table>
+        </div>
+    </div>
+</body>
+
+</html>
